@@ -48,7 +48,7 @@
     <string name="susfs_version">Version</string>
     <string name="susfs_ownership">使用独立 FolkSU 配置，不安装 SUSFS，不修改 ksu_susfs 或第三方设置。</string>
     <string name="susfs_about_title">关于</string>
-    <string name="susfs_about_body">SUSFS Manager —— 从 FinaSU 0.1.0-beta3（github.com/LyraVoid/FinaSU）的 SUSFS 面板非官方抽取的独立界面移植版。与 FinaSU 项目无隶属关系，未获其背书，也不由其提供支持。页面、控制协议与校验逻辑均为 FinaSU 的代码，许可为 GPL-3.0。从未在真机上测试过。</string>
+    <string name="susfs_about_body">SUSFS Manager —— 从 FinaSU 0.1.0-beta3（github.com/LyraVoid/FinaSU）的 SUSFS 面板非官方抽取的独立界面移植版。本项目由 AI 大模型构建，还请轻喷。仅在 Redmi Note 11T Pro 与 Realme GT7 Pro 上测试可用，不保证其他设备可用。与 FinaSU 项目无隶属关系，未获其背书，也不由其提供支持。页面、控制协议与校验逻辑均为 FinaSU 的代码，许可为 GPL-3.0。</string>
     <string name="susfs_unsupported">检测到的能力集不支持此操作</string>
     <string name="susfs_tab_paths">路径</string>
     <string name="susfs_tab_spoof">伪装</string>
