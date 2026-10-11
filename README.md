@@ -212,8 +212,28 @@ It emits legacy icons per density plus an adaptive foreground whose canvas is 10
 content is scaled to 66% and centred, so no launcher mask clips it. The script is reproducible: it
 regenerates the committed PNGs byte-for-byte.
 
-## Credits
+## Credits and licence
 
-The SUSFS UI, the `susfs` control protocol, and the Material components in
-`ui/component/material/` and `wallpaper/` come from FinaSU / KernelSU (GPL-3.0). This port keeps
-that licence.
+**GPL-3.0** — see [`LICENSE`](LICENSE). This is an obligation, not a preference: the screens, theme
+components, view model and validation logic are
+[FinaSU](https://github.com/LyraVoid/FinaSU)'s code, FinaSU is a [KernelSU](https://github.com/tiann/KernelSU)
+derivative, and KernelSU is GPL-3.0.
+
+This app is **not affiliated with, endorsed by, or supported by the FinaSU project**. It is an
+unofficial extraction of one screen. File bugs about this app here; file bugs about FinaSU upstream.
+
+| Taken from | Component |
+| --- | --- |
+| FinaSU `manager/` | `ui/screen/SusfsScreen.kt`, `ui/screen/SusfsEditors.kt`, `ui/viewmodel/SusfsViewModel.kt`, `data/susfs/*` |
+| FinaSU / KernelSU | `ui/component/material/*`, `ui/theme/*`, `wallpaper/*` |
+| FinaSU `userspace/ksud/src/susfs/` | the `status`/`export`/`import`/`apply` control protocol |
+| FinaSU / KernelSU, after [SUSFS](https://gitlab.com/simonpunk/susfs4ksu) | the kernel-side SUSFS interface and `/proc` nodes |
+| AndroidX `material3` | the Material 3 expressive list APIs the screen builds on |
+| [libsu](https://github.com/topjohnwu/libsu) | the root shell |
+
+Written for this port: the Gradle project, `SusfsApplication.kt`, `Natives.kt`,
+`ui/util/RootShell.kt`, `ui/navigation3/Navigator.kt`, `ui/theme/SusfsTheme.kt`, `ui/MainActivity.kt`,
+the launcher icon, and `tools/`.
+
+[`NOTICE.md`](NOTICE.md) carries the same attribution in English and Chinese, alongside the
+untested-status warning and the list of known gaps. Read it before building.

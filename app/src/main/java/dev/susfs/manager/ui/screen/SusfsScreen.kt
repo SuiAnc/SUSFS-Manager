@@ -241,6 +241,9 @@ private fun SusfsOverview(state: SusfsUiState, config: JSONObject?, writable: Bo
             leadingContent = { Icon(Icons.Rounded.VisibilityOff, null) }) }
         item { SegmentedListItem(headlineContent = { Text(susfsManagementLabel(status.management)) },
             supportingContent = { Text(stringResource(R.string.susfs_ack_hint)) }) }
+        item { SegmentedListItem(headlineContent = { Text(stringResource(R.string.susfs_about_title)) },
+            supportingContent = { Text(stringResource(R.string.susfs_about_body)) },
+            leadingContent = { Icon(Icons.Rounded.Info, null) }) }
         item { SegmentedListItem(headlineContent = { Text(stringResource(R.string.susfs_saved_counts,
             config?.optJSONArray("rules")?.length() ?: 0)) }, supportingContent = { Text(stringResource(R.string.susfs_ownership)) }) }
         item { SegmentedSwitchItem(title = stringResource(R.string.susfs_automatic),

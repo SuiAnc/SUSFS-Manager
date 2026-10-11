@@ -16,7 +16,8 @@
 ### What this is
 
 A standalone Android app that exposes exactly one screen: the SUSFS management UI extracted from
-[FinaSU](https://github.com/) `0.1.0-beta3` (package `me.yuki.folksu`, a KernelSU derivative).
+[FinaSU](https://github.com/LyraVoid/FinaSU) `0.1.0-beta3` (package `me.yuki.folksu`, a KernelSU
+derivative, itself GPL-3.0).
 
 It is a **UI transplant, not a reimplementation**. The Compose screens, theme components, view model,
 JSON configuration model, and the full validation logic are FinaSU's code, carried over with the
@@ -117,9 +118,67 @@ evidence that matters, and it has not happened.**
 - **No installer, no module management, no update check, no boot receiver.** All intentionally
   removed from upstream.
 
+### About, and where this came from
+
+This app is **not** affiliated with, endorsed by, or supported by the FinaSU project. It is an
+unofficial extraction of one screen, built by a third party. Bug reports about *this* app belong
+here; bug reports about FinaSU belong upstream.
+
+What was taken, and from where:
+
+| Component | Origin |
+| --- | --- |
+| `ui/screen/SusfsScreen.kt`, `ui/screen/SusfsEditors.kt` | FinaSU `manager/`, SUSFS panel |
+| `ui/viewmodel/SusfsViewModel.kt` | FinaSU |
+| `data/susfs/SusfsRepository.kt`, `SusfsPresentation.kt` | FinaSU |
+| `ui/component/material/*`, `ui/theme/*`, `wallpaper/*` | FinaSU / KernelSU Material components |
+| The `susfs` control protocol (`status`/`export`/`import`/`apply`) | FinaSU `userspace/ksud/src/susfs/` |
+| Kernel-side SUSFS interface and `/proc` nodes | FinaSU / KernelSU, after [SUSFS](https://gitlab.com/simonpunk/susfs4ksu) |
+| Material 3 expressive list APIs the screen builds on | AndroidX `material3` |
+| Root shell | [libsu](https://github.com/topjohnwu/libsu) by topjohnwu |
+
+Written for this port: the Gradle project, `SusfsApplication.kt`, `Natives.kt`,
+`ui/util/RootShell.kt`, `ui/navigation3/Navigator.kt`, `ui/theme/SusfsTheme.kt`, `ui/MainActivity.kt`,
+the launcher icon, and `tools/`.
+
 ### Licence
 
-GPL-3.0. The UI, the JSON protocol, and the command semantics are FinaSU's and KernelSU's work.
+**GPL-3.0.** The full text is in [`LICENSE`](LICENSE), copied verbatim from FinaSU's own `LICENSE`.
+
+This is not a choice — it is an obligation. The screens, theme components, view model and validation
+logic are FinaSU's code, and FinaSU is a KernelSU derivative, and KernelSU is GPL-3.0. A derivative
+work of GPL-3.0 code must itself be GPL-3.0. The port keeps upstream's licence, keeps the full
+licence text in the repository, and names its origin above.
+
+What that means if you redistribute this app or a modified version:
+
+- Ship the complete corresponding source under GPL-3.0, including your modifications.
+- Keep the [`LICENSE`](LICENSE) file and this attribution intact.
+- State prominently what you changed and when.
+- Do not add restrictions that the GPL does not allow, and do not relicense it as something more
+  permissive.
+- Note that **`libksud.so` is not in this repository** — it is a separate GPL-3.0 build artifact you
+  produce from the FinaSU tree. If you ship an APK with it bundled, you are conveying both together.
+
+There is no warranty of any kind, which for this project is not a formality: see the status table
+above.
+
+#### How that obligation is met here
+
+| GPL-3.0 requirement | How this repository satisfies it |
+| --- | --- |
+| §2–3, copyleft of derivative works | Repo is GPL-3.0, not a more permissive licence |
+| §4, complete corresponding source | All source is committed; the only omitted artifact is `libksud.so`, a separate crate you build yourself |
+| §4–5, convey under GPL with licence text | [`LICENSE`](LICENSE) is upstream's file, byte-for-byte (md5 `1ebbd3e34237af26da5dc08a4e440464`) |
+| §5(a), prominent notice of modification | [What was changed from upstream](README.md#what-was-changed-from-upstream-and-why) lists every replacement |
+| §7(b), preserve attribution notices | The origin table above, in both languages |
+| §11, no warranty | Stated above, and in [`README.md`](README.md) |
+| §6, no extra restrictions | No additional terms are imposed on downstream recipients |
+
+Dependency licences were checked for compatibility: **GPL-3.0** (FinaSU/KernelSU code),
+**Apache-2.0** (AndroidX Compose, `material3`), **Apache-2.0** (Kotlin, coroutines), **Apache-2.0**
+(libsu), **Apache-2.0** (Gradle wrapper JAR — build tooling, not linked into the app). No dependency
+imposes a term the GPL forbids.
 
 ---
 
@@ -127,8 +186,8 @@ GPL-3.0. The UI, the JSON protocol, and the command semantics are FinaSU's and K
 
 ### 这是什么
 
-一个只做一件事的独立安卓应用：把 [FinaSU](https://github.com/) `0.1.0-beta3`（包名
-`me.yuki.folksu`，KernelSU 的一个衍生版本）里的 SUSFS 管理界面单独抽出来。
+一个只做一件事的独立安卓应用：把 [FinaSU](https://github.com/LyraVoid/FinaSU) `0.1.0-beta3`（包名
+`me.yuki.folksu`，KernelSU 的一个衍生版本，本身也是 GPL-3.0）里的 SUSFS 管理界面单独抽出来。
 
 它是**界面移植，不是重新实现**。Compose 页面、主题组件、ViewModel、JSON 配置模型以及整套校验
 逻辑都是 FinaSU 的代码，只是去掉了 KernelSU 特有的打包部分。只替换了五处：
@@ -221,6 +280,59 @@ API。**真正构建一次才是唯一有意义的证据，而这件事还没发
 - **只支持 `arm64-v8a`。** 其他 ABI 不会带上载荷。
 - **没有安装器、没有模块管理、没有更新检查、没有开机广播接收器。** 都是从上游有意移除的。
 
+### 关于，以及它的来处
+
+本应用**与 FinaSU 项目无隶属关系**，未获其背书，也不由其提供支持。它是第三方对其中一个页面的非官方
+抽取。关于**本**应用的 bug 反馈请提到这里；关于 FinaSU 的请提到上游。
+
+取了什么、从哪取的：
+
+| 组件 | 来源 |
+| --- | --- |
+| `ui/screen/SusfsScreen.kt`、`ui/screen/SusfsEditors.kt` | FinaSU `manager/` 的 SUSFS 面板 |
+| `ui/viewmodel/SusfsViewModel.kt` | FinaSU |
+| `data/susfs/SusfsRepository.kt`、`SusfsPresentation.kt` | FinaSU |
+| `ui/component/material/*`、`ui/theme/*`、`wallpaper/*` | FinaSU / KernelSU 的 Material 组件 |
+| `susfs` 控制协议（`status`/`export`/`import`/`apply`） | FinaSU `userspace/ksud/src/susfs/` |
+| 内核侧 SUSFS 接口与 `/proc` 节点 | FinaSU / KernelSU，其源头是 [SUSFS](https://gitlab.com/simonpunk/susfs4ksu) |
+| 页面依赖的 Material 3 expressive 列表 API | AndroidX `material3` |
+| root shell | topjohnwu 的 [libsu](https://github.com/topjohnwu/libsu) |
+
+本次移植自己写的部分：Gradle 工程、`SusfsApplication.kt`、`Natives.kt`、`ui/util/RootShell.kt`、
+`ui/navigation3/Navigator.kt`、`ui/theme/SusfsTheme.kt`、`ui/MainActivity.kt`、应用图标，以及
+`tools/`。
+
 ### 许可
 
-GPL-3.0。界面、JSON 协议与命令语义均来自 FinaSU 与 KernelSU 的工作。
+**GPL-3.0。** 完整文本见 [`LICENSE`](LICENSE)，从 FinaSU 自己的 `LICENSE` 原样复制。
+
+这不是可选项，是义务。页面、主题组件、ViewModel 与校验逻辑都是 FinaSU 的代码，FinaSU 是 KernelSU 的
+衍生物，而 KernelSU 是 GPL-3.0。GPL-3.0 代码的衍生作品本身必须是 GPL-3.0。本移植保留上游许可、在
+仓库中保留完整许可文本，并在上面写明了来处。
+
+如果你要再分发本应用或其修改版，这意味着：
+
+- 以 GPL-3.0 提供完整的对应源码，包括你的修改。
+- 保留 [`LICENSE`](LICENSE) 文件与本文的署名信息。
+- 显著说明你改了什么、什么时候改的。
+- 不得附加 GPL 不允许的限制，也不得改以更宽松的许可发布。
+- 注意 **`libksud.so` 不在本仓库中** —— 它是你从 FinaSU 源码树产出的独立 GPL-3.0 构建产物。如果你
+  把 APK 连同它一起分发，就是在同时传递两者。
+
+本项目不提供任何形式的担保 —— 对这个项目来说这不是套话，见上面的状态表。
+
+#### 本仓库如何履行该义务
+
+| GPL-3.0 要求 | 本仓库的满足方式 |
+| --- | --- |
+| §2–3 衍生作品的 copyleft | 仓库以 GPL-3.0 发布，未改为更宽松的许可 |
+| §4 完整对应源码 | 所有源码均已提交；唯一未包含的是 `libksud.so`，那是你自己构建的独立 crate |
+| §4–5 随附许可文本 | [`LICENSE`](LICENSE) 是上游文件逐字节复制（md5 `1ebbd3e34237af26da5dc08a4e440464`） |
+| §5(a) 显著的修改声明 | [相对上游改了什么](README.md#what-was-changed-from-upstream-and-why) 逐条列出每处替换 |
+| §7(b) 保留署名信息 | 上文的中英双语来源表 |
+| §11 无担保 | 上文已声明，[`README.md`](README.md) 中也有 |
+| §6 不附加额外限制 | 未对下游接收者施加任何额外条款 |
+
+依赖许可已核对兼容性：**GPL-3.0**（FinaSU/KernelSU 代码）、**Apache-2.0**（AndroidX Compose、
+`material3`）、**Apache-2.0**（Kotlin、coroutines）、**Apache-2.0**（libsu）、**Apache-2.0**
+（Gradle wrapper JAR —— 构建工具，不链接进应用）。没有任何依赖施加 GPL 所禁止的条款。
