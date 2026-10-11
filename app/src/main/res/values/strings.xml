@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SUSFS Manager</string>
+
+    <!-- Shown on the overview page; the SUSFS strings themselves live in susfs.xml. -->
+    <string name="susfs_standalone_notice">Standalone SUSFS manager. Requires KernelSU, KernelSU-Next or APatch with the SUSFS kernel patch, and Superuser access for this app.</string>
+</resources>

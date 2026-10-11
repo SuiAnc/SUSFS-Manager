@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Adaptive-icon backing. The logo is mostly white, so a dark backing is what keeps it legible
+         once a launcher masks the icon down to its safe zone. -->
+    <color name="ic_launcher_background">#FF1B5E20</color>
+</resources>

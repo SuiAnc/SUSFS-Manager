@@ -1,0 +1,32 @@
+# Gradle / Android build output
+.gradle/
+build/
+*/build/
+app/build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Keystores and signing material — never commit these
+*.jks
+*.keystore
+keystore.properties
+
+# The bundled ksud payload is a multi-megabyte binary artifact of a separate Rust crate.
+# It is produced from the FinaSU tree at build time; see README.md, "Bundling ksud".
+app/src/main/jniLibs/*/libksud.so
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Reproducible icon tooling leaves a local node_modules next to the scripts
+tools/node_modules/

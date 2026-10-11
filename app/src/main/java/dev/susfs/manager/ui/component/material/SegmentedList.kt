@@ -1,0 +1,477 @@
+package dev.susfs.manager.ui.component.material
+
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.SelectableDropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RippleConfiguration
+import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSliderState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.round
+import androidx.compose.ui.zIndex
+import dev.susfs.manager.ui.theme.FolkMotion
+import dev.susfs.manager.wallpaper.LocalFolkWallpaperTokens
+import dev.susfs.manager.wallpaper.WallpaperSurfaceRole
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
+
+val LocalListItemShapes = compositionLocalOf<ListItemShapes?> { null }
+private val SegmentedOuterRadius = 16.dp
+private val SegmentedInnerRadius = 4.dp
+private const val SegmentedSpringStiffness = 800f
+private const val SegmentedSpringDamping = 0.9f
+
+/**
+ * True while a [SegmentedColumn] is drawing one continuous group material behind its rows. In
+ * wallpaper mode a single fill is required: the [ListItemDefaults.SegmentedGap] between rows would
+ * otherwise leak the wallpaper through every seam (they were invisible only because the old rows
+ * sat on an opaque same-colored surface).
+ */
+private val LocalWallpaperGroupActive = staticCompositionLocalOf { false }
+
+@Composable
+private fun WallpaperGroupBackground(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val tokens = LocalFolkWallpaperTokens.current
+    if (tokens == null) {
+        content()
+        return
+    }
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = tokens.group.fill,
+                shape = RoundedCornerShape(SegmentedOuterRadius),
+            )
+    ) {
+        CompositionLocalProvider(
+            LocalWallpaperGroupActive provides true,
+            LocalWallpaperMaterialRole provides WallpaperSurfaceRole.Group,
+        ) {
+            content()
+        }
+    }
+}
+
+@DslMarker
+annotation class SegmentedColumnDsl
+
+@Composable
+private fun defaultSegmentedColors(): ListItemColors {
+    // In wallpaper mode each row carries the group material itself, so the list reads as one
+    // translucent group instead of sitting on a solid surface.
+    val material = LocalFolkWallpaperTokens.current?.group
+    if (material != null) {
+        val inGroup = LocalWallpaperGroupActive.current
+        return ListItemDefaults.segmentedColors(
+            containerColor = if (inGroup) Color.Transparent else material.fill,
+            contentColor = material.contentColor,
+            disabledContainerColor = if (inGroup) Color.Transparent else material.fill,
+            supportingContentColor = material.supportingColor,
+        )
+    }
+    return ListItemDefaults.segmentedColors(
+        containerColor = colorScheme.surfaceBright,
+        disabledContainerColor = colorScheme.surfaceBright,
+        supportingContentColor = colorScheme.onSurfaceVariant
+    )
+}
+
+@Composable
+private fun defaultSingleSegmentedShape(index: Int, count: Int): ListItemShapes {
+    val base = ListItemDefaults.segmentedShapes(index, count)
+    if (LocalFolkWallpaperTokens.current != null) {
+        // Wallpaper mode tiles standalone rows into one continuous group, so only the two ends stay
+        // rounded; square inner corners let adjacent rows meet without a notch.
+        val shape = RoundedCornerShape(
+            topStart = if (index == 0) SegmentedOuterRadius else 0.dp,
+            topEnd = if (index == 0) SegmentedOuterRadius else 0.dp,
+            bottomStart = if (index == count - 1) SegmentedOuterRadius else 0.dp,
+            bottomEnd = if (index == count - 1) SegmentedOuterRadius else 0.dp,
+        )
+        return base.copy(shape = shape)
+    }
+    return if (count == 1) {
+        base.copy(shape = MaterialTheme.shapes.large)
+    } else {
+        base
+    }
+}
+
+@Composable
+fun SegmentedColumn(
+    modifier: Modifier = Modifier,
+    title: String = "",
+    visibleLen: Int = 0,
+    content: List<@Composable () -> Unit>,
+) {
+    if (content.isEmpty()) return
+
+    Column(modifier = modifier) {
+        if (title.isNotEmpty()) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                color = colorScheme.primary,
+                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+            )
+        }
+        WallpaperGroupBackground {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                content.forEachIndexed { index, itemContent ->
+                    CompositionLocalProvider(
+                        LocalListItemShapes provides defaultSingleSegmentedShape(
+                            index = index,
+                            count = if (visibleLen > 0) visibleLen else content.size
+                        ),
+                    ) {
+                        itemContent()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@SegmentedColumnDsl
+class SegmentedColumnScope {
+    internal data class Entry(
+        val key: Any?,
+        val visible: Boolean,
+        val content: @Composable () -> Unit,
+    )
+
+    internal val entries = mutableListOf<Entry>()
+
+    fun item(
+        key: Any? = null,
+        visible: Boolean = true,
+        content: @Composable () -> Unit,
+    ) {
+        entries.add(Entry(key ?: entries.size, visible, content))
+    }
+}
+
+@Composable
+fun SegmentedColumn(
+    modifier: Modifier = Modifier,
+    title: String = "",
+    content: SegmentedColumnScope.() -> Unit,
+) {
+    val entries = SegmentedColumnScope().apply(content).entries
+    if (entries.isEmpty()) return
+
+    Column(modifier = modifier) {
+        if (title.isNotEmpty()) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                color = colorScheme.primary,
+                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+            )
+        }
+
+        val dpSpring = spring<Dp>(SegmentedSpringDamping, SegmentedSpringStiffness)
+
+        val progresses = entries.mapIndexed { index, entry ->
+            key(entry.key ?: index) {
+                animateFloatAsState(
+                    targetValue = if (entry.visible) 1f else 0f,
+                    animationSpec = FolkMotion.smoothSpring(),
+                    label = "SegmentedProgress"
+                )
+            }
+        }
+
+        val firstVisible = entries.indexOfFirst { it.visible }
+        val lastVisible = entries.indexOfLast { it.visible }
+
+        WallpaperGroupBackground {
+            Layout(
+                content = {
+                    entries.forEachIndexed { index, entry ->
+                        key(entry.key ?: index) {
+                            val isFirst = if (firstVisible == -1) index == 0 else index == firstVisible
+                            val isLast = if (lastVisible == -1) index == entries.lastIndex else index == lastVisible
+
+                            val topRadius by animateDpAsState(
+                                if (isFirst) SegmentedOuterRadius else SegmentedInnerRadius,
+                                dpSpring, label = "SegmentedTopRadius"
+                            )
+                            val bottomRadius by animateDpAsState(
+                                if (isLast) SegmentedOuterRadius else SegmentedInnerRadius,
+                                dpSpring, label = "SegmentedBottomRadius"
+                            )
+                            val gap by animateDpAsState(
+                                if (isFirst) 0.dp else ListItemDefaults.SegmentedGap,
+                                dpSpring, label = "SegmentedGap"
+                            )
+
+                            val shape = RoundedCornerShape(
+                                topStart = topRadius, topEnd = topRadius,
+                                bottomStart = bottomRadius, bottomEnd = bottomRadius
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .zIndex(if (entry.visible) (entries.size - index).toFloat() else -index.toFloat())
+                                    .graphicsLayer {
+                                        val progress = progresses[index].value.coerceAtLeast(0f)
+                                        clip = true
+                                        this.shape = object : Shape {
+                                            override fun createOutline(
+                                                size: Size,
+                                                layoutDirection: LayoutDirection,
+                                                density: Density,
+                                            ): Outline = Outline.Rectangle(Rect(0f, 0f, size.width, size.height * progress))
+                                        }
+                                        alpha = (progress * 1.5f).coerceIn(0f, 1f)
+                                    }
+                            ) {
+                                CompositionLocalProvider(
+                                    LocalListItemShapes provides ListItemDefaults.segmentedShapes(0, 1).copy(shape = shape)
+                                ) {
+                                    Column(modifier = Modifier.padding(top = gap)) {
+                                        entry.content()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ) { measurables, constraints ->
+                val placeables = measurables.map { it.measure(constraints) }
+                val positions = IntArray(placeables.size)
+                var y = 0f
+                placeables.forEachIndexed { index, placeable ->
+                    positions[index] = y.roundToInt()
+                    y += placeable.height * progresses[index].value.coerceAtLeast(0f)
+                }
+                layout(constraints.maxWidth, y.roundToInt().coerceAtLeast(0)) {
+                    placeables.forEachIndexed { index, placeable ->
+                        placeable.placeRelative(0, positions[index])
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+/**
+ * M3's [SegmentedListItem] hard-codes its ripple and has no `indication` parameter to turn it off,
+ * so a press reads through [folkPressScale] instead. The same [MutableInteractionSource] drives the
+ * scale and the row's own clickable, and a transparent ripple configuration stands in for
+ * `indication = null` on the row.
+ */
+@Composable
+private fun SegmentedRow(
+    modifier: Modifier,
+    clickable: Boolean,
+    enabled: Boolean,
+    interactionSource: MutableInteractionSource?,
+    content: @Composable (Modifier, MutableInteractionSource) -> Unit,
+) {
+    val pressedSource = interactionSource ?: remember { MutableInteractionSource() }
+    val rowModifier = if (clickable) modifier.folkPressScale(pressedSource, enabled) else modifier
+    val rippleConfiguration = if (clickable) {
+        RippleConfiguration(color = Color.Transparent)
+    } else {
+        LocalRippleConfiguration.current
+    }
+    CompositionLocalProvider(LocalRippleConfiguration provides rippleConfiguration) {
+        content(rowModifier, pressedSource)
+    }
+}
+
+@Composable
+fun SegmentedListItem(
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
+    colors: ListItemColors = defaultSegmentedColors(),
+    interactionSource: MutableInteractionSource? = null,
+    headlineContent: @Composable () -> Unit,
+    overlineContent: @Composable (() -> Unit)? = null,
+    supportingContent: @Composable (() -> Unit)? = null,
+    leadingContent: @Composable (() -> Unit)? = null,
+    trailingContent: @Composable (() -> Unit)? = null,
+) {
+    SegmentedRow(
+        modifier = modifier,
+        clickable = onClick != null,
+        enabled = enabled,
+        interactionSource = interactionSource,
+    ) { rowModifier, source ->
+        SegmentedListItem(
+            onClick = onClick ?: {},
+            onLongClick = onLongClick,
+            enabled = enabled,
+            colors = colors,
+            interactionSource = source,
+            shapes = LocalListItemShapes.current ?: ListItemDefaults.segmentedShapes(0, 1),
+            modifier = rowModifier,
+            leadingContent = leadingContent,
+            trailingContent = trailingContent,
+            overlineContent = overlineContent,
+            supportingContent = supportingContent,
+            verticalAlignment = Alignment.CenterVertically,
+            content = headlineContent
+        )
+    }
+}
+
+
+@Composable
+fun SegmentedListItem(
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    colors: ListItemColors = defaultSegmentedColors(),
+    interactionSource: MutableInteractionSource? = null,
+    headlineContent: @Composable () -> Unit,
+    overlineContent: @Composable (() -> Unit)? = null,
+    supportingContent: @Composable (() -> Unit)? = null,
+    leadingContent: @Composable (() -> Unit)? = null,
+    trailingContent: @Composable (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
+) {
+    SegmentedRow(
+        modifier = modifier,
+        clickable = true,
+        enabled = enabled,
+        interactionSource = interactionSource,
+    ) { rowModifier, source ->
+        SegmentedListItem(
+            selected = selected,
+            onClick = onClick,
+            shapes = LocalListItemShapes.current ?: ListItemDefaults.segmentedShapes(0, 1),
+            modifier = rowModifier,
+            enabled = enabled,
+            colors = colors,
+            interactionSource = source,
+            leadingContent = leadingContent,
+            trailingContent = trailingContent,
+            overlineContent = overlineContent,
+            supportingContent = supportingContent,
+            verticalAlignment = Alignment.CenterVertically,
+            onLongClick = onLongClick,
+            content = headlineContent
+        )
+    }
+}
+
+@Composable
+fun SegmentedSwitchItem(
+    icon: ImageVector? = null,
+    title: String,
+    summary: String? = null,
+    colors: ListItemColors = defaultSegmentedColors(),
+    checked: Boolean,
+    enabled: Boolean = true,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    val haptic = LocalHapticFeedback.current
+    val interactionSource = remember { MutableInteractionSource() }
+
+    SegmentedListItem(
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.VirtualKey)
+            onCheckedChange(!checked)
+        },
+        enabled = enabled,
+        interactionSource = interactionSource,
+        colors = colors,
+        headlineContent = { Text(title) },
+        leadingContent = icon?.let { { Icon(it, title) } },
+        trailingContent = {
+            ExpressiveSwitch(
+                checked = checked,
+                enabled = enabled,
+                onCheckedChange = null,
+                interactionSource = interactionSource,
+            )
+        },
+        supportingContent = summary?.let { { Text(it) } }
+    )
+}
+
+
+
+
+
