@@ -14,6 +14,38 @@
 >
 > **仅在 Redmi Note 11T Pro 与 Realme GT7 Pro 上测试可用，不保证其他设备可用。**
 
+## Who this is for — and who it is not for
+
+**A personal project, published for the author's own use. It will not be maintained.** No bug
+fixes, no feature requests, no compatibility updates, no issue replies.
+
+**You almost certainly have better options.** For SUSFS management on KernelSU, use
+**[SUSFS-FOR-KERNELSU](https://github.com/sidex15/susfs4ksu-module)** or
+**[BRENE - SuSFS](https://github.com/rrr333nnn333/BRENE)** instead. Both are actively maintained,
+both are modules rather than standalone apps, and both have far more users than this.
+
+**This app is only for you if** you already run [FinaSU](https://github.com/LyraVoid/FinaSU), you
+specifically want *its* SUSFS panel as a separate launcher entry, you are willing to build it
+yourself, and you accept rebuilding it whenever you rebuild ksud. If that is not you, one of the two
+projects above is the better choice — not a consolation prize, but a genuinely better-maintained one.
+
+**Do not open issues expecting a fix.** Forking is welcome; GPL-3.0 gives you every right to.
+
+## 这个应用给谁用，不给谁用
+
+**纯粹的作者自用项目，不会进行维护。** 不修 bug、不接受功能请求、不跟进兼容性、不回复 issue。
+
+**你几乎肯定有更好的选择。** 想在 KernelSU 上管理 SUSFS，请改用
+**[SUSFS-FOR-KERNELSU](https://github.com/sidex15/susfs4ksu-module)** 或
+**[BRENE - SuSFS](https://github.com/rrr333nnn333/BRENE)**。两者都在积极维护，都是模块而非独立
+App，用户量也远多于本项目。
+
+**只有**你本来就在用 [FinaSU](https://github.com/LyraVoid/FinaSU)、且要的就是**它那个** SUSFS 面板、
+希望做成独立启动器入口、愿意自己构建、并接受每次重编 ksud 都要重新构建 App，这个应用才是给你用的。
+如果不是，上面那两个项目是更好的选择 —— 它们不是退而求其次，而是确实维护得更好。
+
+**不要抱着「提了就会修」的期待去开 issue。** 欢迎 fork，GPL-3.0 给了你完整的权利。
+
 A standalone Android app that is **only** the SUSFS management UI, extracted from
 FinaSU 0.1.0-beta3 (a KernelSU fork). It does not bundle a kernel, a daemon, or a module store.
 

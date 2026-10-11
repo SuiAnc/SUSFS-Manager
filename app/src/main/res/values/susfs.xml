@@ -48,7 +48,7 @@
     <string name="susfs_version">Version</string>
     <string name="susfs_ownership">Independent FolkSU configuration. Does not install SUSFS or modify ksu_susfs / third-party settings.</string>
     <string name="susfs_about_title">About</string>
-    <string name="susfs_about_body">SUSFS Manager — an unofficial standalone UI port of the SUSFS panel from FinaSU 0.1.0-beta3 (github.com/LyraVoid/FinaSU). Built with a large language model as the coding agent — please be gentle. Verified working only on Redmi Note 11T Pro and Realme GT7 Pro; no guarantee of usability anywhere else. Not affiliated with, endorsed by, or supported by the FinaSU project. The screens, control protocol and validation logic are FinaSU\'s code; the licence is GPL-3.0.</string>
+    <string name="susfs_about_body">SUSFS Manager — an unofficial standalone UI port of the SUSFS panel from FinaSU 0.1.0-beta3 (github.com/LyraVoid/FinaSU). Built with a large language model as the coding agent — please be gentle. Verified working only on Redmi Note 11T Pro and Realme GT7 Pro; no guarantee of usability anywhere else. A personal project that will not be maintained: no bug fixes, no feature requests. If you want SUSFS management on KernelSU, use SUSFS-FOR-KERNELSU (github.com/sidex15/susfs4ksu-module) or BRENE - SuSFS (github.com/rrr333nnn333/BRENE) instead — both are actively maintained. Not affiliated with, endorsed by, or supported by the FinaSU project. The screens, control protocol and validation logic are FinaSU\'s code; the licence is GPL-3.0.</string>
     <string name="susfs_unsupported">Not supported by the detected capability set</string>
     <string name="susfs_tab_paths">Paths</string>
     <string name="susfs_tab_spoof">Spoofing</string>

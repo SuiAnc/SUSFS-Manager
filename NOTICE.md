@@ -26,6 +26,41 @@
 
 ## English
 
+### Read this first: who this is for, and who it is not for
+
+**This is a personal project, published for the author's own use. It will not be maintained.**
+
+No bug fixes, no feature requests, no compatibility updates, no response to issues. If it breaks on
+your device, on a newer Android, on a newer SUSFS, or on a kernel you patched differently, it will
+stay broken. That is the deal, and it is better to know it now than after you have spent an evening
+building it.
+
+**You almost certainly have better options.** If you want SUSFS management on KernelSU, use one of
+these instead — both are actively maintained, both are modules rather than standalone apps, and both
+have far more users than this:
+
+| Project | What it is | Licence | Activity |
+| --- | --- | --- | --- |
+| [SUSFS-FOR-KERNELSU](https://github.com/sidex15/susfs4ksu-module) | An addon root hiding service for KernelSU | AGPL-3.0 | Actively maintained |
+| [BRENE - SuSFS](https://github.com/rrr333nnn333/BRENE) | A SuSFS/KernelSU module for SuSFS-patched kernels | AGPL-3.0 | Actively maintained |
+
+**This app is only for you if all of the following hold:**
+
+- You already run [FinaSU](https://github.com/LyraVoid/FinaSU) and specifically want **its** SUSFS
+  panel, not a different one.
+- You want that panel as a **separate launcher entry** instead of a screen inside the manager, and
+  you are willing to build it yourself.
+- You accept the cost that comes with it: an APK that carries its own `ksud` payload, must be
+  rebuilt whenever you rebuild ksud, and is only known to work on the two devices listed above.
+- You are comfortable reading the source when something goes wrong, **because there is no support**.
+
+If any of those do not hold, use one of the two projects above. That is not a consolation prize —
+they are more complete and better maintained than this. Choosing them is the correct decision, not
+a failure to find the right thing.
+
+**Do not open issues expecting a fix.** You are welcome to fork it, and GPL-3.0 gives you every
+right to; you are just not going to get a reply from here.
+
 ### What this is
 
 A standalone Android app that exposes exactly one screen: the SUSFS management UI extracted from
@@ -220,6 +255,37 @@ imposes a term the GPL forbids.
 ---
 
 ## 中文
+
+### 请先读：这个应用给谁用，不给谁用
+
+**这是纯粹的作者自用项目，放出来只是顺手。不会进行维护。**
+
+不修 bug、不接受功能请求、不跟进兼容性、不回复 issue。如果它在你的设备上、在新版 Android 上、
+在新版 SUSFS 上、或在你自己打的另一种内核上跑不起来，那它就会一直跑不起来。这就是条件，早点知道
+比折腾一晚上之后才知道要好。
+
+**你几乎肯定有更好的选择。** 如果你想在 KernelSU 上管理 SUSFS，请改用下面这两个 —— 都在积极维护，
+都是模块而不是独立 App，用户量也远多于本项目：
+
+| 项目 | 说明 | 许可 | 活跃度 |
+| --- | --- | --- | --- |
+| [SUSFS-FOR-KERNELSU](https://github.com/sidex15/susfs4ksu-module) | KernelSU 的附加 root 隐藏服务 | AGPL-3.0 | 积极维护 |
+| [BRENE - SuSFS](https://github.com/rrr333nnn333/BRENE) | 面向已打 SuSFS 补丁内核的 SuSFS/KernelSU 模块 | AGPL-3.0 | 积极维护 |
+
+**只有以下条件全部成立，这个应用才是给你用的：**
+
+- 你本来就在用 [FinaSU](https://github.com/LyraVoid/FinaSU)，并且要的就是**它那个** SUSFS 面板，
+  而不是别的实现。
+- 你希望把这个面板做成**独立的启动器入口**，而不是管理器里的一个页面，并且愿意自己构建。
+- 你接受随之而来的代价：APK 自带 `ksud` 载荷，每次重编 ksud 都得重新构建 App，而且已知能用的设备
+  只有上面列出的那两台。
+- 出问题时你愿意自己读源码，**因为这里没有支持**。
+
+上面任何一条不成立，就去用那两个项目。这不是退而求其次 —— 它们比本项目更完整、维护得更好。选它们
+是正确决定，而不是没找到「本该找到的东西」。
+
+**不要抱着「提了就会修」的期待去开 issue。** 欢迎你 fork，GPL-3.0 给了你完整的权利；只是这里不会
+有人回复。
 
 ### 这是什么
 
