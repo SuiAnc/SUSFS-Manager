@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Haptic feedback on segmented-list presses. No other permission is required: every SUSFS
          operation goes through the root shell, not through an Android API. -->
     <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- The SukiSU-Ultra page lists installed apps so you can pick a package for a SUSFS path
+         rule. Without this, Android 11+ only exposes this app itself. -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
 
     <application
         android:name=".SusfsApplication"

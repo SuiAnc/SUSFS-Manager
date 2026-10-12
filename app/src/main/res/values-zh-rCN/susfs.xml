@@ -48,7 +48,7 @@
     <string name="susfs_version">Version</string>
     <string name="susfs_ownership">使用独立 FolkSU 配置，不安装 SUSFS，不修改 ksu_susfs 或第三方设置。</string>
     <string name="susfs_about_title">关于</string>
-    <string name="susfs_about_body">SUSFS Manager —— 从 FinaSU 0.1.0-beta3（github.com/LyraVoid/FinaSU）的 SUSFS 面板非官方抽取的独立界面移植版。本项目由 AI 大模型构建，还请轻喷。仅在 Redmi Note 11T Pro 与 Realme GT7 Pro 上测试可用，不保证其他设备可用。纯粹的作者自用项目，不会进行维护：不修 bug、不接受功能请求。想在 KernelSU 上管理 SUSFS，建议改用 SUSFS-FOR-KERNELSU（github.com/sidex15/susfs4ksu-module）或 BRENE - SuSFS（github.com/rrr333nnn333/BRENE），两者都在积极维护。与 FinaSU 项目无隶属关系，未获其背书，也不由其提供支持。页面、控制协议与校验逻辑均为 FinaSU 的代码，许可为 GPL-3.0。</string>
+    <string name="susfs_about_body">SUSFS Manager —— 从 FinaSU 0.1.0-beta3（github.com/LyraVoid/FinaSU）与 SukiSU-Ultra 4.2.0（github.com/SukiSU-Ultra/SukiSU-Ultra）的 SUSFS 面板非官方抽取的独立界面移植版，并提供设置项选择显示哪一套。本项目由 AI 大模型构建，还请轻喷。仅在 Redmi Note 11T Pro 与 Realme GT7 Pro 上测试可用，不保证其他设备可用。纯粹的作者自用项目，不会进行维护：不修 bug、不接受功能请求。想在 KernelSU 上管理 SUSFS，建议改用 SUSFS-FOR-KERNELSU（github.com/sidex15/susfs4ksu-module）或 BRENE - SuSFS（github.com/rrr333nnn333/BRENE），两者都在积极维护。与 FinaSU、SukiSU-Ultra 项目均无隶属关系，未获其背书，也不由其提供支持。页面、控制协议与校验逻辑均为它们的代码，许可为 GPL-3.0。</string>
     <string name="susfs_unsupported">检测到的能力集不支持此操作</string>
     <string name="susfs_tab_paths">路径</string>
     <string name="susfs_tab_spoof">伪装</string>
@@ -103,4 +103,11 @@
     <string name="susfs_add_entry">添加条目</string>
     <string name="susfs_module_hint">模块名称须为 1–63 个 ASCII 字母、数字或下划线。不会加载或卸载模块。</string>
     <string name="susfs_prefix_hint">通过开放的 LKM 控制节点隐藏挂载前缀；不会全局清空已有规则。</string>
+    <string name="manager_mode_label">管理器</string>
+    <string name="manager_mode_title">选择 SUSFS 管理器</string>
+    <string name="manager_mode_folksu">FolkSU</string>
+    <string name="manager_mode_sukisu">SukiSU-Ultra</string>
+    <string name="manager_mode_folksu_desc">使用 libksud.so，FinaSU 的 JSON 导出 / 导入 / 应用协议。</string>
+    <string name="manager_mode_sukisu_desc">使用 libksud2.so，SukiSU-Ultra 的 susfs 配置键协议。</string>
+    <string name="manager_mode_note">页面与命令后端一起切换，改动立即生效，无需重启。</string>
 </resources>

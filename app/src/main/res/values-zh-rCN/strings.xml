@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SUSFS Manager</string>
+
+    <!-- Shown on the overview page; the SUSFS strings themselves live in susfs.xml. -->
+    <string name="susfs_standalone_notice">独立 SUSFS 管理器。需要已打 SUSFS 内核补丁的 KernelSU、KernelSU-Next 或 APatch，并为本应用授予 root 权限。</string>
+</resources>

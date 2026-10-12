@@ -68,28 +68,52 @@ android {
     }
 }
 
-// The app execs `libksud.so` out of its native library dir at runtime, so an APK built without it
-// installs cleanly and then fails every SUSFS call with `unrecognized subcommand 'susfs'` -- the
-// exact bug this project exists to fix. `tools/static_check.py` reports the same thing offline.
+// The app execs its `ksud` payloads out of the native library dir at runtime, so an APK built
+// without them installs cleanly and then fails every SUSFS call with `unrecognized subcommand
+// 'susfs'` -- the exact bug this project exists to fix. `tools/static_check.py` reports the same
+// thing offline.
+//
+// Two payloads are bundled because the app can drive two different managers:
+//   libksud.so   -- FolkSU / FinaSU, `ksud susfs status|export|import|apply` (JSON protocol)
+//   libksud2.so  -- SukiSU-Ultra,   `ksud susfs status|config|...` (config-key protocol)
+// Android extracts every `lib*.so` from jniLibs when useLegacyPackaging is on, which is what makes
+// executing them from nativeLibraryDir legal.
 //
 // These are plain Gradle lifecycle tasks (`preBuild` and the per-variant `preReleaseBuild`), so
 // nothing here depends on an AGP variant API that may move between releases. Debug only warns, so
-// the UI can still be built while ksud is being compiled; release is fatal, because shipping this
-// APK would be shipping a broken app.
-val ksudPayload = layout.projectDirectory.file("src/main/jniLibs/arm64-v8a/libksud.so").asFile
-val ksudMissingMessage = """
-    app/src/main/jniLibs/arm64-v8a/libksud.so is missing.
-    The APK will install, but every SUSFS command will fail with:
-      error: unrecognized subcommand 'susfs'
-    because stock KernelSU / KernelSU-Next ksud does not implement that subcommand.
-    Build FinaSU's ksud and copy it in -- see README.md, "Bundling ksud".
-""".trimIndent()
+// the UI can still be built while a payload is being compiled; release is fatal, because shipping
+// this APK would be shipping a broken app.
+val ksudPayloads = listOf(
+    Triple(
+        "libksud.so",
+        "FolkSU / FinaSU (JSON export / import / apply protocol)",
+        layout.projectDirectory.file("src/main/jniLibs/arm64-v8a/libksud.so").asFile,
+    ),
+    Triple(
+        "libksud2.so",
+        "SukiSU-Ultra (susfs config-key protocol)",
+        layout.projectDirectory.file("src/main/jniLibs/arm64-v8a/libksud2.so").asFile,
+    ),
+)
+val ksudMissingMessage = ksudPayloads.joinToString("\n\n") { (name, who, file) ->
+    if (file.exists()) {
+        ""
+    } else {
+        """
+        app/src/main/jniLibs/arm64-v8a/$name is missing.
+        Needed to drive $who.
+        The APK will install, but those SUSFS commands will fail with:
+          error: unrecognized subcommand 'susfs'
+        Build that manager's ksud and copy it in -- see README.md, "Bundling ksud".
+        """.trimIndent()
+    }
+}.let { it.replace(Regex("\n{3,}"), "\n\n").trim() }
 
 tasks.matching { it.name == "preBuild" }.configureEach {
-    doFirst { if (!ksudPayload.exists()) logger.warn("WARNING: $ksudMissingMessage") }
+    doFirst { if (ksudMissingMessage.isNotEmpty()) logger.warn("WARNING:\n$ksudMissingMessage") }
 }
 tasks.matching { it.name == "preReleaseBuild" }.configureEach {
-    doFirst { if (!ksudPayload.exists()) throw GradleException(ksudMissingMessage) }
+    doFirst { if (ksudMissingMessage.isNotEmpty()) throw GradleException(ksudMissingMessage) }
 }
 
 kotlin {
